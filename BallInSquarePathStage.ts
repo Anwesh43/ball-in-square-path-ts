@@ -182,11 +182,11 @@ class  BSPNode {
     }
 }
 
-class BallInSquareStep {
+class BallInSquarePath {
     root : BSPNode = new BSPNode(0)
     curr : BSPNode = this.root
     dir : number = 1
-    
+
     draw(context : CanvasRenderingContext2D) {
         this.root.draw(context)
     }
@@ -202,5 +202,27 @@ class BallInSquareStep {
 
     startUpdating(cb : Function) {
         this.curr.startUpdating(cb)
+    }
+}
+
+class Renderer {
+
+    bsp : BallInSquarePath = new BallInSquarePath()
+    animator : Animator = new Animator()
+
+    render(context : CanvasRenderingContext2D) {
+        this.bsp.draw(context)
+    }
+
+    handleTap(cb : Function) {
+        this.bsp.startUpdating(() => {
+            this.animator.start(() => {
+                cb()
+                this.bsp.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
     }
 }
