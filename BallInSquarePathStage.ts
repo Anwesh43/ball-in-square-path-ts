@@ -17,7 +17,7 @@ const divideScale : Function = (scale : number, i : number, n : number) : number
     return Math.min(1/n, maxScale(scale, i, n)) * n
 }
 
-const scaleFactor : Function = (scale : number) : number => Math.floor(this / scDiv)
+const scaleFactor : Function = (scale : number) : number => Math.floor(scale / scDiv)
 const mirrorValue : Function = (scale : number, a : number, b : number) : number => {
     const k : number = scaleFactor(scale)
     return (1 - k) / a + k / b
@@ -25,6 +25,8 @@ const mirrorValue : Function = (scale : number, a : number, b : number) : number
 const updateScale : Function = (scale : number, dir : number, a : number, b : number) : number => {
     return mirrorValue(scale, a, b) * dir * scGap
 }
+
+const getIndex : Function = (scale : number, n : number) => Math.floor(scale * n * 0.99)
 
 const drawBSPNode : Function = (context : CanvasRenderingContext2D, i : number, scale : number) => {
     const gap : number = w / (nodes + 1)
@@ -38,25 +40,20 @@ const drawBSPNode : Function = (context : CanvasRenderingContext2D, i : number, 
     context.fillStyle = foreColor
     context.save()
     context.translate((i + 1) * gap, h/2)
-    var deg : number = 0
-    var sc : number = 0
     for (var j = 0; j < paths; j++) {
         context.save()
-        context.rotate(Math.PI/2 * j)
+        context.rotate((Math.PI/2) * j)
         context.beginPath()
         context.moveTo(size, size)
-        context.lineTo(-2 * size, 0)
+        context.lineTo(-size, size)
         context.stroke()
         context.restore()
-        var scj : number = divideScale(sc, j, paths)
-        if (scj > 0 && scj <= 1) {
-            sc = scj
-        } else if (scj == 1) {
-            sc = 1
-        }
-        deg += (Math.PI / 2) * Math.floor(sc)
     }
-    var x : number = size - 2 * size * sc
+    const k = getIndex(sc1, paths)
+    var sc : number = divideScale(sc1, k, paths)
+    console.log(`scale is ${sc}`)
+    var deg : number = Math.PI/2 * k
+    var x : number = size - 2 * size *sc
     context.save()
     context.rotate(deg)
     context.beginPath()
