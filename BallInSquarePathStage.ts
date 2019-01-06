@@ -60,7 +60,7 @@ const drawBSPNode : Function = (context : CanvasRenderingContext2D, i : number, 
     context.save()
     context.rotate(deg)
     context.beginPath()
-    context.arc(x, size, r, 0, 2 * Math.PI)
+    context.arc(x, size, r * (1 - sc2), 0, 2 * Math.PI)
     context.fill()
     context.restore()
     context.restore()
@@ -93,5 +93,28 @@ class BallInSquarePathStage {
         stage.initCanvas()
         stage.render()
         stage.handleTap()
+    }
+}
+
+class State {
+    scale : number = 0
+    dir : number = 0
+    prevScale : number = 0
+
+    update(cb : Function) {
+        this.scale += updateScale(this.scale, this.dir, paths, 1)
+        if (Math.abs(this.scale - this.prevScale) > 1) {
+            this.scale = this.prevScale + this.dir
+            this.dir = 0
+            this.prevScale = this.scale
+            cb()
+        }
+    }
+
+    startUpdating(cb) {
+        if (this.dir == 0) {
+            this.dir = 1 - 2 * this.prevScale
+            cb()
+        }
     }
 }
